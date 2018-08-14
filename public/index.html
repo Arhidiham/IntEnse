@@ -1,0 +1,85 @@
+<html>
+	<body>
+		<form>
+			<div>Number</div>
+			<div><input type="text" name="number" id="number"></input></div>
+			<div style="width: 100%; overflow: hidden; padding-top: 10px;">
+				<button type="button" name="odd" id="odd" onclick="calculate(this);">Odd</button>
+				<button type="button" name="even" id="even" onclick="calculate(this);">Even</button>
+				<button type="button" name="gauss" id="gauss" onclick="calculate(this);">Sum All</button>
+			</div>
+			<div style="padding-top: 10px;">
+				<label>Result:</label>
+				<input type="text" id="result" readonly></input>
+			</div>
+		</form>
+	</body>
+</html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+
+/**
+ * Tests that the value provided is a positive integer.
+ * 
+ * @param mixed number - the variable to be tested
+ * 
+ * @return bool - if the variable is valid
+ */
+function validate(number)
+{
+    var valid = true;
+    if (number != parseInt(number, 10)) {
+        valid = false;
+    }
+    if (number <= 0) {
+        valid = false;
+    }
+    return valid;
+}
+
+/**
+ * Calculates the correct sum for the button pressed. 
+ *
+ * @param object button - the button clicked
+ *
+ * @return void
+ */
+function calculate(button)
+{
+    var number = $('#number').val();
+    var type = button.id;
+    if (validate(number)) {
+        call(number, type);
+    } else {
+        $('#result').val('Not a positive integer.');
+    }
+}
+
+/**
+ * Calls the back-end and calculates the sum for the type provided.
+ * Sets the result field with the response.
+ *
+ * @param int number - the number to sum up
+ * @param string type - the type of calculation to do
+ *
+ * @return void
+ */
+function call(number, type)
+{
+    $.ajax({
+        method: 'POST',
+        url: 'controller.php',
+        data: {number: number, type: type},
+        dataType: 'json',
+        success: function(data) {
+            // check if the request was a success
+            if (data.success) {
+                // set the result field to our sum result
+                $('#result').val(data.data);
+            } else {
+                $('#result').val('Error calculating sum.');
+            }
+        }
+    });
+}
+</script>
